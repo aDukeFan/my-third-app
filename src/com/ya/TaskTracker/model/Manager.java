@@ -1,36 +1,46 @@
+package com.ya.TaskTracker;
+
+import com.ya.TaskTracker.model.*;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 
 public class Manager {
-    private LinkedHashMap<Integer, SimpleTask> simpleTasks = new LinkedHashMap<>();
-    private LinkedHashMap<Integer, SubTask> subTasks = new LinkedHashMap<>();
-    private LinkedHashMap<Integer, Epic> epicTasks = new LinkedHashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    private HashMap<Integer, Epic> epicTasks = new HashMap<>();
 
-    private int nextId = 1;
+    private int nextId = 0;
 
-    // Создание. Сам объект должен передаваться в качестве параметра
-    public int make(SimpleTask task) {
-        task.id = nextId++;
-        simpleTasks.put(task.id, task);
-        return task.id;
+    // Добавил set метод:
+    private void setId(int nextId) {
+        nextId++;
+        this.nextId = nextId;
     }
 
-    public int make(Epic epic) {
-        epic.id = nextId++;
+    // Создание. Присваивание ID реализовал через set метод:
+    public void make(Task task) {
+        setId(nextId);
+        task.id = nextId;
+        tasks.put(task.id, task);
+    }
+
+    public void make(Epic epic) {
+        setId(nextId);
+        epic.id = nextId;
         epicTasks.put(epic.id, epic);
-        return epic.id;
     }
 
-    public int make(SubTask task) {
-        task.id = nextId++;
+    public void make(SubTask task) {
+        setId(nextId);
+        task.id = nextId;
         subTasks.put(task.id, task);
-        return task.id;
     }
 
     //Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра
-    public void update(SimpleTask task) {
-        simpleTasks.put(task.id, task);
+    public void update(Task task) {
+        tasks.put(task.id, task);
 
     }
 
@@ -45,21 +55,27 @@ public class Manager {
     }
 
     // Получение списка всех задач
-    public LinkedHashMap<Integer, SimpleTask> getSimpleTasks() {
-        return simpleTasks;
+    public ArrayList<Task> getTasks() {
+        ArrayList<Task> values = new ArrayList<>();
+        tasks.forEach((key, value) -> values.add(value));
+        return values;
     }
 
-    public LinkedHashMap<Integer, SubTask> getSubTasks() {
-        return subTasks;
+    public ArrayList<SubTask> getSubTasks() {
+        ArrayList<SubTask> values = new ArrayList<>();
+        subTasks.forEach((key, value) -> values.add(value));
+        return values;
     }
 
-    public LinkedHashMap<Integer, Epic> getEpicTasks() {
-        return epicTasks;
+    public ArrayList<Epic> getEpicTasks() {
+        ArrayList<Epic> values = new ArrayList<>();
+        epicTasks.forEach((key, value) -> values.add(value));
+        return values;
     }
 
     // Удаление всех задач.
-    public void clearSimpleTasks() {
-        simpleTasks.clear();
+    public void clearTasks() {
+        tasks.clear();
     }
 
     public void clearSubTasks() {
@@ -71,8 +87,8 @@ public class Manager {
     }
 
     // Получение по идентификатору
-    public SimpleTask getSimpleTaskById(int id) {
-        return simpleTasks.get(id);
+    public Task getTaskById(int id) {
+        return tasks.get(id);
     }
 
     public SubTask getSubTaskById(int id) {
@@ -84,8 +100,8 @@ public class Manager {
     }
 
     // Удаление по идентификатору
-    public SimpleTask delSimpleTaskById(int id) {
-        return simpleTasks.remove(id);
+    public Task delSimpleTaskById(int id) {
+        return tasks.remove(id);
     }
 
     public SubTask delSubTaskById(int id) {
