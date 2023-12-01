@@ -1,3 +1,5 @@
+package com.ya.TaskTracker.model;
+
 public class Task {
     protected int id;
     protected String name;
