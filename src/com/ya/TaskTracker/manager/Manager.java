@@ -1,11 +1,8 @@
 package com.ya.TaskTracker.model;
 
-import com.sun.jdi.IntegerValue;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Objects;
 
 public class Manager {
     private HashMap<Integer, Task> tasks = new HashMap<>();
@@ -13,7 +10,6 @@ public class Manager {
     private HashMap<Integer, Epic> epicTasks = new HashMap<>();
 
     private int nextId = 0;
-    private HashMap<Integer, SubTask> s;
 
     // Добавил set метод:
     private void setId(int nextId) {
@@ -92,24 +88,18 @@ public class Manager {
 
     // Получение списка всех задач
     public ArrayList<Task> getTasks() {
-        ArrayList<Task> values = new ArrayList<>();
-        tasks.forEach((key, value) -> values.add(value));
-        return values;
+        return new ArrayList<>(tasks.values());
     }
 
     public ArrayList<SubTask> getSubTasks() {
-        ArrayList<SubTask> values = new ArrayList<>();
-        subTasks.forEach((key, value) -> values.add(value));
-        return values;
+        return new ArrayList<>(subTasks.values());
     }
 
     public ArrayList<Epic> getEpicTasks() {
-        ArrayList<Epic> values = new ArrayList<>();
-        epicTasks.forEach((key, value) -> values.add(value));
-        return values;
+        return new ArrayList<>(epicTasks.values());
     }
 
-    // Удаление всех задач.
+    // Удаление всех задач
     public void clearTasks() {
         tasks.clear();
     }
