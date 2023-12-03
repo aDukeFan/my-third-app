@@ -15,29 +15,29 @@ public class Manager {
 
     private int nextId = 0;
 
-    private void generateId(int nextId) {
-        this.nextId = ++nextId;
+    private int generateId() {
+        return nextId++;
     }
 
     public void save(Task task) {
-        generateId(nextId);
-        task.setId(nextId);
-        tasks.put(nextId, task);
+        int newId = generateId();
+        task.setId(newId);
+        tasks.put(newId, task);
     }
 
     public void save(Epic epic) {
-        generateId(nextId);
-        epic.setId(nextId);
-        epicTasks.put(nextId, epic);
+        int newId = generateId();
+        epic.setId(newId);
+        epicTasks.put(newId, epic);
     }
 
-    public void save(SubTask subTask, int epicId) {
-        generateId(nextId);
-        subTask.setId(nextId);
-        subTask.setEpicId(epicId);
-        subTasks.put(nextId, subTask);
-        getEpicById(epicId).addToSubTaskIds(nextId);
-        setEpicStatus(getEpicById(epicId));
+    public void save(SubTask subTask) {
+        int newtId = generateId();
+        subTask.setId(newtId);
+        subTasks.put(newtId, subTask);
+        Epic epic = getEpicById(subTask.getEpicId());
+        epic.addToSubTaskIds(newtId);
+        setEpicStatus(epic);
     }
 
     public void update(Task task) {
@@ -98,9 +98,9 @@ public class Manager {
     }
 
     public void delSubTaskById(int id) {
-        int epicId = subTasks.get(id).getEpicId();
-        getEpicById(epicId).getSubTaskIds().removeIf(value -> (value == id));
-        setEpicStatus(getEpicById(epicId));
+        Epic epic = getEpicById(subTasks.get(id).getEpicId());
+        epic.getSubTaskIds().removeIf(value -> (value == id));
+        setEpicStatus(epic);
         subTasks.remove(id);
     }
 

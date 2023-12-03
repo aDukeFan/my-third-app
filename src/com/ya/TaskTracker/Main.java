@@ -29,13 +29,13 @@ public class Main {
 
         SubTask subTask1 = new SubTask("Подзадача 1 (эпика 2)",
                 "Оплатить учебу",
-                "IN_PROGRESS");
-        manager.save(subTask1, epicWith2Subtask.getId());
+                "IN_PROGRESS", epicWith2Subtask.getId());
+        manager.save(subTask1);
 
         SubTask subTask2 = new SubTask("Подзадача 2 (эпика 2)",
                 "Учиться",
-                "NEW");
-        manager.save(subTask2, epicWith2Subtask.getId());
+                "NEW", epicWith2Subtask.getId());
+        manager.save(subTask2);
 
         Epic epicWith1Subtask = new Epic("Эпик 1",
                 "Готовим глазунью");
@@ -43,8 +43,8 @@ public class Main {
 
         SubTask subTask3 = new SubTask("Подзадача 3 (эпика 1)",
                 "Готовить",
-                "DONE");
-        manager.save(subTask3, epicWith1Subtask.getId());
+                "DONE", epicWith1Subtask.getId());
+        manager.save(subTask3);
 
         //Распечатайте списки эпиков, задач и подзадач, через System.out.println(..)
         System.out.println("Список всех Epic: " + manager.getEpicTasks());
@@ -80,6 +80,6 @@ public class Main {
 
         // Попробуйте удалить одну из задач и один из эпиков
         manager.delTaskById(task1.getId());
-        manager.delEpicById(epicWith2Subtask.getId());
+        manager.delEpicById(epicWith1Subtask.getId());
     }
 }
