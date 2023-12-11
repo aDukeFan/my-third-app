@@ -1,6 +1,6 @@
 package com.ya.TaskTracker.model;
 
-public enum Statuses {
+public enum Status {
     NEW,
     IN_PROGRESS,
     DONE

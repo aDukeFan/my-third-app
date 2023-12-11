@@ -3,7 +3,7 @@ package com.ya.TaskTracker.model;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Integer> subTaskIds = new ArrayList<>();
+    private final ArrayList<Integer> subTaskIds = new ArrayList<>();
 
     public ArrayList<Integer> getSubTaskIds() {
         return subTaskIds;
@@ -14,7 +14,7 @@ public class Epic extends Task {
     }
 
     public Epic(String name, String description) {
-        super(name, description, "NEW");
+        super(name, description, Status.NEW);
     }
 }
 

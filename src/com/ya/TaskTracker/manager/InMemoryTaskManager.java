@@ -1,36 +1,44 @@
 package com.ya.TaskTracker.manager;
 
 import com.ya.TaskTracker.model.Epic;
+import com.ya.TaskTracker.model.Status;
 import com.ya.TaskTracker.model.SubTask;
 import com.ya.TaskTracker.model.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
-public class Manager {
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    private HashMap<Integer, Epic> epicTasks = new HashMap<>();
+public class InMemoryTaskManager implements TaskManager {
+    private final HashMap<Integer, Task> tasks = new HashMap<>();
+    private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    private final HashMap<Integer, Epic> epicTasks = new HashMap<>();
+
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private int nextId = 0;
+
 
     private int generateId() {
         return nextId++;
     }
 
+    @Override
     public void save(Task task) {
         int newId = generateId();
         task.setId(newId);
         tasks.put(newId, task);
     }
 
+    @Override
     public void save(Epic epic) {
         int newId = generateId();
         epic.setId(newId);
         epicTasks.put(newId, epic);
     }
 
+    @Override
     public void save(SubTask subTask) {
         int newtId = generateId();
         subTask.setId(newtId);
@@ -40,63 +48,80 @@ public class Manager {
         setEpicStatus(epic);
     }
 
+    @Override
     public void update(Task task) {
         tasks.put(task.getId(), task);
     }
 
+    @Override
     public void update(Epic epic) {
         epicTasks.put(epic.getId(), epic);
     }
 
+    @Override
     public void update(SubTask subTask) {
         subTasks.put(subTask.getId(), subTask);
         setEpicStatus(epicTasks.get(subTask.getEpicId()));
     }
 
     // Получение списка всех задач
+    @Override
     public ArrayList<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
+    @Override
     public ArrayList<SubTask> getSubTasks() {
         return new ArrayList<>(subTasks.values());
     }
 
+    @Override
     public ArrayList<Epic> getEpicTasks() {
         return new ArrayList<>(epicTasks.values());
     }
 
+    @Override
     public void clearAllTasks() {
         tasks.clear();
     }
 
+    @Override
     public void clearAllSubTasks() {
         subTasks.clear();
         epicTasks.forEach((key, value) -> value.getSubTaskIds().clear());
         epicTasks.forEach((key, value) -> setEpicStatus(value));
     }
 
+    @Override
     public void clearAllEpics() {
         subTasks.clear();
         epicTasks.clear();
     }
 
+    @Override
     public Task getTaskById(int id) {
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
+    @Override
     public SubTask getSubTaskById(int id) {
+        historyManager.add(subTasks.get(id));
         return subTasks.get(id);
     }
 
+    @Override
     public Epic getEpicById(int id) {
+        historyManager.add(epicTasks.get(id));
         return epicTasks.get(id);
     }
 
+    @Override
     public void delTaskById(int id) {
         tasks.remove(id);
     }
 
+    @Override
     public void delSubTaskById(int id) {
         Epic epic = getEpicById(subTasks.get(id).getEpicId());
         epic.getSubTaskIds().removeIf(value -> (value == id));
@@ -104,6 +129,7 @@ public class Manager {
         subTasks.remove(id);
     }
 
+    @Override
     public void delEpicById(int id) {
         epicTasks.remove(id);
         for (SubTask subTask : subTasks.values()) {
@@ -114,20 +140,27 @@ public class Manager {
     }
 
     //Управление статусом Epic
-    private void setEpicStatus(Epic epic) {
+    @Override
+    public void setEpicStatus(Epic epic) {
         ArrayList<Integer> epicsSubTaskIds = epic.getSubTaskIds();
         if (epicsSubTaskIds.isEmpty()) {
-            epic.setStatus("NEW");
+            epic.setStatus(Status.NEW);
         } else {
-            HashSet<String> subStatuses = new HashSet<>();
+            HashSet<Status> subStatuses = new HashSet<>();
             for (Integer subTaskId : epic.getSubTaskIds()) {
                 subStatuses.add(subTasks.get(subTaskId).getStatus());
             }
             if (subStatuses.size() > 1) {
-                epic.setStatus("IN_PROGRESS");
+                epic.setStatus(Status.IN_PROGRESS);
             } else {
-                epic.setStatus(String.join("", subStatuses));
+                subStatuses.forEach(epic::setStatus);
             }
         }
     }
+
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
 }

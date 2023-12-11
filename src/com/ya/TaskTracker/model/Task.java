@@ -4,28 +4,28 @@ public class Task {
     protected int id;
     protected String name;
     protected String description;
-    protected String status;
+    protected Status status;
 
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public int getId() {
         return id;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public Task(String name, String description, String status) {
+    public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
         this.status = status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 }
