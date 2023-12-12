@@ -18,6 +18,7 @@ public interface TaskManager {
     void update(Task task);
 
     void update(Epic epic);
+
     void update(SubTask subTask);
 
     List<Task> getTasks();
@@ -47,5 +48,4 @@ public interface TaskManager {
     void setEpicStatus(Epic epic);
 
     List<Task> getHistory();
-
 }

@@ -19,6 +19,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             viewedTasks.removeFirst();
         }
     }
+
     @Override
     public LinkedList<Task> getHistory() {
         return viewedTasks;
