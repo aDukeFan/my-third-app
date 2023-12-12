@@ -1,11 +1,11 @@
-package com.ya.TaskTracker;
+package com.ya.tasktracker;
 
-import com.ya.TaskTracker.manager.Managers;
-import com.ya.TaskTracker.manager.TaskManager;
-import com.ya.TaskTracker.model.Epic;
-import com.ya.TaskTracker.model.Status;
-import com.ya.TaskTracker.model.SubTask;
-import com.ya.TaskTracker.model.Task;
+import com.ya.tasktracker.manager.Managers;
+import com.ya.tasktracker.manager.TaskManager;
+import com.ya.tasktracker.model.Epic;
+import com.ya.tasktracker.model.Status;
+import com.ya.tasktracker.model.SubTask;
+import com.ya.tasktracker.model.Task;
 
 public class Main {
 
@@ -47,11 +47,6 @@ public class Main {
 
         // вызовите разные методы интерфейса TaskManager
         // и напечатайте историю просмотров после каждого вызова.
-        System.out.println(taskManager.getHistory());
-        /* у меня на входе история имеет в себе просмотр трех эпиков, поскольку метод save()
-        при создании Subtask использует getEpicById(subTask.getEpicId());
-        я оставил эту проблему открытой, поскольку из условий задачи не понятно,
-        является ли такое использование этого метода просмотром задачи */
         taskManager.getTaskById(task1.getId());
         System.out.println(taskManager.getHistory());
         taskManager.getSubTaskById(subTask1.getId());
@@ -64,6 +59,9 @@ public class Main {
         System.out.println(taskManager.getHistory());
         taskManager.getEpicById(epicWith1Subtask.getId());
         System.out.println(taskManager.getHistory());
+        taskManager.getSubTaskById(subTask1.getId());
+        taskManager.getSubTaskById(subTask2.getId());
+        taskManager.getSubTaskById(subTask3.getId());
         taskManager.getSubTaskById(subTask1.getId());
         taskManager.getSubTaskById(subTask2.getId());
         taskManager.getSubTaskById(subTask3.getId());

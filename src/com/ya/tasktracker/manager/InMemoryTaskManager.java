@@ -1,19 +1,16 @@
-package com.ya.TaskTracker.manager;
+package com.ya.tasktracker.manager;
 
-import com.ya.TaskTracker.model.Epic;
-import com.ya.TaskTracker.model.Status;
-import com.ya.TaskTracker.model.SubTask;
-import com.ya.TaskTracker.model.Task;
+import com.ya.tasktracker.model.Epic;
+import com.ya.tasktracker.model.Status;
+import com.ya.tasktracker.model.SubTask;
+import com.ya.tasktracker.model.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epicTasks = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, SubTask> subTasks = new HashMap<>();
+    private final Map<Integer, Epic> epicTasks = new HashMap<>();
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -43,7 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
         int newtId = generateId();
         subTask.setId(newtId);
         subTasks.put(newtId, subTask);
-        Epic epic = getEpicById(subTask.getEpicId());
+        Epic epic = epicTasks.get(subTask.getEpicId());
         epic.addToSubTaskIds(newtId);
         setEpicStatus(epic);
     }
@@ -66,17 +63,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Получение списка всех задач
     @Override
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public ArrayList<SubTask> getSubTasks() {
+    public List<SubTask> getSubTasks() {
         return new ArrayList<>(subTasks.values());
     }
 
     @Override
-    public ArrayList<Epic> getEpicTasks() {
+    public List<Epic> getEpicTasks() {
         return new ArrayList<>(epicTasks.values());
     }
 
@@ -142,7 +139,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Управление статусом Epic
     @Override
     public void setEpicStatus(Epic epic) {
-        ArrayList<Integer> epicsSubTaskIds = epic.getSubTaskIds();
+        List<Integer> epicsSubTaskIds = epic.getSubTaskIds();
         if (epicsSubTaskIds.isEmpty()) {
             epic.setStatus(Status.NEW);
         } else {

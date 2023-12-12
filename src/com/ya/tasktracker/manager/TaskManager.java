@@ -1,8 +1,8 @@
-package com.ya.TaskTracker.manager;
+package com.ya.tasktracker.manager;
 
-import com.ya.TaskTracker.model.Epic;
-import com.ya.TaskTracker.model.SubTask;
-import com.ya.TaskTracker.model.Task;
+import com.ya.tasktracker.model.Epic;
+import com.ya.tasktracker.model.SubTask;
+import com.ya.tasktracker.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,11 @@ public interface TaskManager {
     void update(Epic epic);
     void update(SubTask subTask);
 
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
-    ArrayList<SubTask> getSubTasks();
+    List<SubTask> getSubTasks();
 
-    ArrayList<Epic> getEpicTasks();
+    List<Epic> getEpicTasks();
 
     void clearAllTasks();
 
