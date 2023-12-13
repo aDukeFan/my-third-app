@@ -4,7 +4,6 @@ import com.ya.tasktracker.model.Epic;
 import com.ya.tasktracker.model.SubTask;
 import com.ya.tasktracker.model.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {

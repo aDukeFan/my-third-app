@@ -1,11 +1,17 @@
 package com.ya.tasktracker.manager;
 
+import com.ya.tasktracker.history.HistoryManager;
 import com.ya.tasktracker.model.Epic;
 import com.ya.tasktracker.model.Status;
 import com.ya.tasktracker.model.SubTask;
 import com.ya.tasktracker.model.Task;
-
-import java.util.*;
+/* Как раз при нажатии Ctrl + Alt + O у меня IDEA
+импорты меняет на java.util.*, вручную поправил: */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.HashSet;
 
 public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> tasks = new HashMap<>();

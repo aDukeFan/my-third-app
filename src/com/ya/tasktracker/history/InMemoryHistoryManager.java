@@ -1,4 +1,4 @@
-package com.ya.tasktracker.manager;
+package com.ya.tasktracker.history;
 
 import com.ya.tasktracker.model.Task;
 
@@ -21,7 +21,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public LinkedList<Task> getHistory() {
-        return viewedTasks;
+    public List<Task> getHistory() {
+        return List.copyOf(viewedTasks);
     }
 }

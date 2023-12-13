@@ -1,12 +1,11 @@
-package com.ya.tasktracker.manager;
+package com.ya.tasktracker.history;
 
 import com.ya.tasktracker.model.Task;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public interface HistoryManager {
     void add(Task task);
 
-    LinkedList<Task> getHistory();
+    List<Task> getHistory();
 }
