@@ -20,7 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
-    private int nextId = 0;
+    private int nextId = 1;
 
 
     private int generateId() {
@@ -121,6 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void delTaskById(int id) {
+        historyManager.remove(id);
         tasks.remove(id);
     }
 
@@ -129,17 +130,19 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = getEpicById(subTasks.get(id).getEpicId());
         epic.getSubTaskIds().removeIf(value -> (value == id));
         setEpicStatus(epic);
+        historyManager.remove(id);
         subTasks.remove(id);
     }
 
     @Override
     public void delEpicById(int id) {
-        epicTasks.remove(id);
-        for (SubTask subTask : subTasks.values()) {
-            if (subTask.getEpicId() == id) {
-                subTasks.remove(id);
-            }
+        List<Integer> subTaskIds = epicTasks.get(id).getSubTaskIds();
+        for (Integer subTaskId : subTaskIds) {
+            historyManager.remove(subTaskId);
+            subTasks.remove(subTaskId);
         }
+        historyManager.remove(id);
+        epicTasks.remove(id);
     }
 
     //Управление статусом Epic
