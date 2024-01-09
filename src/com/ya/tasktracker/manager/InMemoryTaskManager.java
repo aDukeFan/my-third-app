@@ -145,7 +145,6 @@ public class InMemoryTaskManager implements TaskManager {
         epicTasks.remove(id);
     }
 
-    //Управление статусом Epic
     @Override
     public void setEpicStatus(Epic epic) {
         List<Integer> epicsSubTaskIds = epic.getSubTaskIds();

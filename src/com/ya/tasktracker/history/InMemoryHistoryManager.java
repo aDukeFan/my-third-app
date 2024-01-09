@@ -16,6 +16,10 @@ public class InMemoryHistoryManager implements HistoryManager {
     private void linkedLast(Task task) {
         if (acceptedTasks.containsKey(task.getId())) {
             removeNode(acceptedTasks.get(task.getId()));
+            /* На комментарий:
+            Метод remove должен также использоваться
+            при удалении всех задач по типам из соответсвующей мапы, добавил его ниже */
+            acceptedTasks.remove(task.getId()); // Правильно ли я понял?
         }
         final Node<Task> oldTail = tail;
         final Node<Task> newNode = new Node<>(tail, task, null);

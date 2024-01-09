@@ -75,18 +75,13 @@ public class Main {
                 "что из истории удалился как сам эпик, так и все его подзадачи.");
         System.out.println(taskManager.getHistory().size() +
                 " - размер истории до удаление эпика с 3 подзадачами");
-        taskManager.delTaskById(epicWith3Subtasks.getId());
-        System.out.println(taskManager.getHistory().size() +
-                " - размер после удаления эпика с 3 подзадачами," + " подзадачи не удаляются =(");
-        System.out.println(taskManager.getHistory());
-        System.out.println("То есть, да я понимаю, что у меня ошибка,\n" +
-                "но никак не могу ее найти уже второй день, буду рад,\n" +
-                "если ты мне на нее укажешь, спасибо!");
-
-        System.out.println("\nПосле удаления эпика," +
-                " удаление его субтасков происходит успешно");
-        System.out.println(taskManager.getSubTasks().size() + " кол-во до");
+        //Посмотрел незамыленным взглядом,
+        // оказалось, что в коде все в порядке,
+        // просто я использовал не тот метод для удаления Epic:
+        // taskManager.delTaskById(epicWith3Subtasks.getId());
         taskManager.delEpicById(epicWith3Subtasks.getId());
-        System.out.println(taskManager.getSubTasks().size() + " кол-во после");
+        System.out.println(taskManager.getHistory().size() +
+                " - размер после удаления эпика с 3 подзадачами, теперь все работает");
+        System.out.println(taskManager.getHistory());
     }
 }
