@@ -7,6 +7,8 @@ import com.ya.tasktracker.model.Status;
 import com.ya.tasktracker.model.SubTask;
 import com.ya.tasktracker.model.Task;
 
+import java.util.Set;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -63,13 +65,13 @@ public class Main {
         System.out.println(taskManager.getHistory());
         taskManager.getTaskById(task1.getId()); //8
         System.out.println(taskManager.getHistory());
-
-        System.out.println(epicWith3Subtasks.getSubTaskIds() + " субтаски эпика3");
-
-        System.out.println("\nудалите задачу, которая есть в истории, " +
-                "и проверьте, что при печати она не будет выводиться");
+        System.out.print(Set.copyOf(taskManager.getHistory()).size() == taskManager.getHistory().size());
+        System.out.print(" - в истории нет повторов\n");
+        System.out.println("\nудалите задачу, которая есть в истории");
         taskManager.delTaskById(task2.getId());
-        System.out.println(taskManager.getHistory());
+        System.out.println(taskManager.getHistory().contains(task2) +
+                " - задача успешно удалена из истории");
+        System.out.println("Проверьте, что при печати она не будет выводиться:\n" + taskManager.getHistory());
 
         System.out.println("\nудалите эпик с тремя подзадачами и убедитесь,\n" +
                 "что из истории удалился как сам эпик, так и все его подзадачи.");
@@ -83,5 +85,9 @@ public class Main {
         System.out.println(taskManager.getHistory().size() +
                 " - размер после удаления эпика с 3 подзадачами, теперь все работает");
         System.out.println(taskManager.getHistory());
+        taskManager.clearAllEpics();
+        System.out.println("\n" + taskManager.getHistory() +
+                " - при удалении всех задач по типам из соответсвующей мапы," +
+                " история теперь также чистится");
     }
 }
