@@ -28,4 +28,12 @@ public class Task {
     public Status getStatus() {
         return status;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

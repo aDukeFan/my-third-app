@@ -29,9 +29,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> getTasks() {
         List<Task> viewedTasks = new ArrayList<>();
         Node<Task> first = head;
-        if (first == null) {
-            System.err.println("You have no history yet =(");
-        } else {
+        if (first != null) {
             while (first != null) {
                 viewedTasks.add(first.getData());
                 first = first.getNext();
