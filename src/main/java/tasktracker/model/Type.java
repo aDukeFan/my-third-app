@@ -1,4 +1,4 @@
-package com.ya.tasktracker.model;
+package tasktracker.model;
 
 public enum Type {
     TASK,

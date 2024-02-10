@@ -1,6 +1,6 @@
-package com.ya.tasktracker.history;
+package tasktracker.manager;
 
-import com.ya.tasktracker.model.Task;
+import tasktracker.model.Task;
 
 import java.util.List;
 

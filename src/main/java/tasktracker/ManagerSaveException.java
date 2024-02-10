@@ -1,4 +1,4 @@
-package com.ya.tasktracker;
+package tasktracker;
 
 public class ManagerSaveException extends RuntimeException {
 

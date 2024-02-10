@@ -1,8 +1,8 @@
-package com.ya.tasktracker.manager;
+package tasktracker.manager;
 
-import com.ya.tasktracker.model.Epic;
-import com.ya.tasktracker.model.SubTask;
-import com.ya.tasktracker.model.Task;
+import tasktracker.model.Epic;
+import tasktracker.model.SubTask;
+import tasktracker.model.Task;
 
 import java.util.List;
 
@@ -44,8 +44,9 @@ public interface TaskManager {
 
     void delEpicById(int id);
 
-    void setEpicStatus(Epic epic);
+    //void setEpicStatus(Epic epic);
 
     List<Task> getHistory();
 
+    List<Task> getPrioritizedTasks();
 }

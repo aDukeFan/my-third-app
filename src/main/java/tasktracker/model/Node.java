@@ -1,4 +1,4 @@
-package com.ya.tasktracker.history;
+package tasktracker.model;
 
 public class Node <Task> {
     private Task data;

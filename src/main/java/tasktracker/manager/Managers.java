@@ -1,7 +1,4 @@
-package com.ya.tasktracker.manager;
-
-import com.ya.tasktracker.history.HistoryManager;
-import com.ya.tasktracker.history.InMemoryHistoryManager;
+package tasktracker.manager;
 
 public class Managers {
 
