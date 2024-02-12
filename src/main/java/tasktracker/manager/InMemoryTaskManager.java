@@ -13,7 +13,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Sub> subTasks = new HashMap<>();
     protected final Map<Integer, Epic> epicTasks = new HashMap<>();
 
-    protected final Set<Task> priority = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    protected final Set<Task> priority = new TreeSet<>(new StartTimeComparator());
 
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -240,22 +240,24 @@ public class InMemoryTaskManager implements TaskManager {
 
     private boolean isValid(Task task) {
         boolean isPossible = true;
-        LocalDateTime expectStart = task.getStartTime();
-        LocalDateTime expectEnd = task.getEndTime();
-        for (Task existTask : priority) {
-            LocalDateTime startOfBusyTime = existTask.getStartTime();
-            LocalDateTime endOfBusyTime = existTask.getEndTime();
-            //Если вы нашли пересечение по времени хоть с одной задачей, можно дальше не искать, а делать break цикла
-            boolean isPossibleBefore = expectStart.isBefore(startOfBusyTime) &&
-                    (expectEnd.isBefore(startOfBusyTime) || expectEnd.isEqual(startOfBusyTime));
-            boolean isPossibleAfter = expectStart.isAfter(endOfBusyTime) || expectStart.isEqual(endOfBusyTime);
-            if (isPossibleBefore == isPossibleAfter) {
-                isPossible = false;
-                break;
+        if (Optional.ofNullable(task.getStartTime()).isPresent()) {
+            LocalDateTime expectStart = task.getStartTime();
+            LocalDateTime expectEnd = task.getEndTime();
+            for (Task existTask : priority) {
+                LocalDateTime startOfBusyTime = existTask.getStartTime();
+                LocalDateTime endOfBusyTime = existTask.getEndTime();
+                //Если вы нашли пересечение по времени хоть с одной задачей, можно дальше не искать, а делать break цикла
+                boolean isPossibleBefore = expectStart.isBefore(startOfBusyTime) &&
+                        (expectEnd.isBefore(startOfBusyTime) || expectEnd.isEqual(startOfBusyTime));
+                boolean isPossibleAfter = expectStart.isAfter(endOfBusyTime) || expectStart.isEqual(endOfBusyTime);
+                if (isPossibleBefore == isPossibleAfter) {
+                    isPossible = false;
+                    break;
+                }
             }
+            if (!(isPossible)) System.err.println(
+                    "WARNING! Time is busy: task named \"" + task.getName() + "\" hasn't be saved.");
         }
-        if (!(isPossible)) System.err.println(
-                "WARNING! Time is busy: task named \"" + task.getName() + "\" hasn't be saved.");
         return isPossible;
     }
 }
