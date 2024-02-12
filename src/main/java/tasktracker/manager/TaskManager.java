@@ -1,7 +1,7 @@
 package tasktracker.manager;
 
 import tasktracker.model.Epic;
-import tasktracker.model.SubTask;
+import tasktracker.model.Sub;
 import tasktracker.model.Task;
 
 import java.util.List;
@@ -12,17 +12,17 @@ public interface TaskManager {
 
     void save(Epic epic);
 
-    void save(SubTask subTask);
+    void save(Sub sub);
 
     void update(Task task);
 
     void update(Epic epic);
 
-    void update(SubTask subTask);
+    void update(Sub sub);
 
     List<Task> getTasks();
 
-    List<SubTask> getSubTasks();
+    List<Sub> getSubTasks();
 
     List<Epic> getEpicTasks();
 
@@ -34,7 +34,7 @@ public interface TaskManager {
 
     Task getTaskById(int id);
 
-    SubTask getSubTaskById(int id);
+    Sub getSubTaskById(int id);
 
     Epic getEpicById(int id);
 
@@ -43,8 +43,6 @@ public interface TaskManager {
     void delSubTaskById(int id);
 
     void delEpicById(int id);
-
-    //void setEpicStatus(Epic epic);
 
     List<Task> getHistory();
 

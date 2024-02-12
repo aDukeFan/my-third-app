@@ -3,12 +3,13 @@ package tasktracker.manager;
 import org.junit.jupiter.api.BeforeEach;
 import tasktracker.model.Status;
 import tasktracker.model.Task;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-class HistoryManagerTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class InMemoryHistoryManagerTest {
     private InMemoryHistoryManager historyManager;
 
     @BeforeEach
@@ -32,13 +33,14 @@ class HistoryManagerTest {
         historyManager.add(makeTestTask(1));
         historyManager.add(makeTestTask(1));
         historyManager.add(makeTestTask(2));
-        Assertions.assertEquals(2, historyManager.getHistory().size());
+        assertEquals(2, historyManager.getHistory().size());
     }
 
     @Test
     void getHistoryShouldReturnEmptyHistoryList() {
-        Assertions.assertTrue(historyManager.getHistory().isEmpty());
+        assertTrue(historyManager.getHistory().isEmpty());
     }
+
     @Test
     void shouldRemoveFirstTask() {
         historyManager.add(makeTestTask(1));
@@ -46,7 +48,7 @@ class HistoryManagerTest {
         historyManager.add(makeTestTask(2));
         historyManager.add(makeTestTask(3));
         historyManager.remove(1);
-        Assertions.assertFalse(historyManager.getHistory().contains(taskToRemove));
+        assertFalse(historyManager.getHistory().contains(taskToRemove));
     }
 
     @Test
@@ -56,7 +58,7 @@ class HistoryManagerTest {
         Task taskToRemove = historyManager.getHistory().get(1);
         historyManager.add(makeTestTask(3));
         historyManager.remove(2);
-        Assertions.assertFalse(historyManager.getHistory().contains(taskToRemove));
+        assertFalse(historyManager.getHistory().contains(taskToRemove));
     }
 
     @Test
@@ -66,7 +68,7 @@ class HistoryManagerTest {
         historyManager.add(makeTestTask(3));
         Task taskToRemove = historyManager.getHistory().get(2);
         historyManager.remove(3);
-        Assertions.assertFalse(historyManager.getHistory().contains(taskToRemove));
+        assertFalse(historyManager.getHistory().contains(taskToRemove));
     }
 
 }

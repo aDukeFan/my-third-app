@@ -18,14 +18,14 @@ class EpicTest {
         return epic;
     }
     private void makeTestSub(Status status, int epicId, LocalDateTime startTime) {
-        SubTask subTask = new SubTask(
+        Sub sub = new Sub(
                 "Sub",
                 "for test",
                 status,
                 startTime,
                 10,
                 epicId);
-        inMemoryTaskManager.save(subTask);
+        inMemoryTaskManager.save(sub);
     }
 
     @Test
@@ -69,10 +69,10 @@ class EpicTest {
         Assertions.assertNull(epic.getStartTime());
         Assertions.assertNull(epic.getEndTime());
         Assertions.assertEquals(0, epic.getDuration());
-        makeTestSub(Status.NEW, epic.getId(), LocalDateTime.of(2024, 2, 10, 20, 30));
+        makeTestSub(Status.NEW, epic.getId(), LocalDateTime.of(2024, 2, 10, 20, 40));
         makeTestSub(Status.NEW, epic.getId(), LocalDateTime.of(2024, 2, 10, 20, 50));
         Assertions.assertEquals(20, epic.getDuration());
-        Assertions.assertEquals(LocalDateTime.of(2024, 2, 10, 20, 30),
+        Assertions.assertEquals(LocalDateTime.of(2024, 2, 10, 20, 40),
                 epic.getStartTime());
         Assertions.assertEquals(LocalDateTime.of(2024, 2, 10, 21,0 ),
                 epic.getEndTime());

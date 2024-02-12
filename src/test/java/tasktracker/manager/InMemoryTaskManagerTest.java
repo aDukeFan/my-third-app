@@ -36,8 +36,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 "Task",
                 "for test",
                 Status.NEW,
-                LocalDateTime.of(2024, 2, 10, 10, 30),
-                30);
+                LocalDateTime.of(2024, 2, 10, 10, 20),
+                10);
         manager.save(notValidTask);
         assertNull(manager.getTaskById(3));
         assertNotEquals(3, manager.getTasks().size());

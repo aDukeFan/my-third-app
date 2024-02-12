@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tasktracker.model.Epic;
 import tasktracker.model.Status;
-import tasktracker.model.SubTask;
+import tasktracker.model.Sub;
 import tasktracker.model.Task;
 
 import java.time.LocalDateTime;
@@ -16,26 +16,20 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     public T manager;
 
-    //Для подзадач нужно дополнительно проверить наличие эпика, а для эпика — расчёт статуса.
-    //Для каждого метода нужно проверить его работу:
-    //  a. Со стандартным поведением.
-    //  b. С пустым списком задач.
-    //  c. С неверным идентификатором задачи (пустой и/или несуществующий идентификатор).
-
     private final Task task = new Task(
             "Task",
             "for test",
             Status.NEW,
-            LocalDateTime.of(2024, 1, 1, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 1, 0),
             10);
     private final Epic epic = new Epic(
             "Task",
             "for test");
-    private final SubTask sub = new SubTask(
+    private final Sub sub = new Sub(
             "Sub",
             "for test",
             Status.IN_PROGRESS,
-            LocalDateTime.of(2024, 1, 2, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 1, 10),
             10,
             1);
 
@@ -75,7 +69,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.save(epic);
         manager.save(sub);
         Epic changedEpic = manager.getEpicById(1);
-        SubTask savedSub = manager.getSubTaskById(2);
+        Sub savedSub = manager.getSubTaskById(2);
         assertEquals(2, savedSub.getId());
         assertEquals(Status.IN_PROGRESS, savedSub.getStatus());
         assertEquals(Status.IN_PROGRESS, savedSub.getStatus());
@@ -103,13 +97,20 @@ abstract class TaskManagerTest<T extends TaskManager> {
             + "WHEN epicTasks put changedEpic, savedEpic be removed from epicTasks "
             + "THEN manager get changedEpic, which is different from savedEpic in changed parameter")
     @Test
-    public void update_epic_shouldRePutEpicWithSameId() {
+    public void update_epic_shouldRePutEpicWithChangedNameAndDurationButWithoutChangedTimePoints() {
+        epic.setStartTime(LocalDateTime.of(2022, 10, 10, 10, 10));
+        epic.setDuration(360);
         manager.save(epic);
-        long oldDuration = manager.getEpicById(1).getDuration();
-        epic.setDuration(50);
-        manager.update(epic);
-        assertNotEquals(50, oldDuration);
-        assertEquals(1, manager.getEpicTasks().get(0).getId());
+        Epic epicToUpdate = new Epic("Updated Epic", "with new time points, but same id");
+        epicToUpdate.setStartTime(LocalDateTime.of(2020, 10, 10, 10, 10));
+        epicToUpdate.setDuration(60);
+        epicToUpdate.setId(1);
+        manager.update(epicToUpdate);
+        Epic epicAfterUpdate = manager.getEpicById(1);
+        assertEquals(epicAfterUpdate.getName(), epicToUpdate.getName());
+        assertEquals(epicAfterUpdate.getDescription(), epicToUpdate.getDescription());
+        assertNotEquals(epicAfterUpdate.getDuration(), epicToUpdate.getDuration());
+        assertNotEquals(epicAfterUpdate.getStartTime(), epicToUpdate.getStartTime());
     }
 
     @DisplayName("GIVEN changedSub with id, which has been set for another savedSub "
@@ -179,6 +180,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(sub, manager.getSubTaskById(2));
         assertEquals(epic, manager.getEpicById(1));
     }
+
     @Test
     public void shouldDelTaskById() {
         manager.save(task);
