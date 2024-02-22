@@ -21,6 +21,7 @@ public class Epic extends Task {
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW, null, 0);
+        this.type = Type.EPIC;
     }
 
     public void setStartTime(LocalDateTime startTime) {

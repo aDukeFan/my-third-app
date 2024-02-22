@@ -13,7 +13,7 @@ class InMemoryHistoryManagerTest {
     private InMemoryHistoryManager historyManager;
 
     @BeforeEach
-    void createdEpicInManagers() {
+    public void createdEpicInManagers() {
         historyManager = new InMemoryHistoryManager();
     }
 

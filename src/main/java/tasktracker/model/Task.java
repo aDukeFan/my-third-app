@@ -1,6 +1,7 @@
 package tasktracker.model;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class Task {
     protected int id;
@@ -47,7 +48,11 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plusMinutes(duration);
+        if (Optional.ofNullable(startTime).isEmpty()) {
+            return null;
+        } else {
+            return startTime.plusMinutes(duration);
+        }
     }
 
     public long getDuration() {

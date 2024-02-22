@@ -22,9 +22,9 @@ public interface TaskManager {
 
     List<Task> getTasks();
 
-    List<Sub> getSubTasks();
+    List<Sub> getSubs();
 
-    List<Epic> getEpicTasks();
+    List<Epic> getEpics();
 
     void clearAllTasks();
 
@@ -34,7 +34,7 @@ public interface TaskManager {
 
     Task getTaskById(int id);
 
-    Sub getSubTaskById(int id);
+    Sub getSubById(int id);
 
     Epic getEpicById(int id);
 

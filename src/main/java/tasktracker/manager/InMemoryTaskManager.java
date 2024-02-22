@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> tasks = new HashMap<>();
-    protected final Map<Integer, Sub> subTasks = new HashMap<>();
-    protected final Map<Integer, Epic> epicTasks = new HashMap<>();
+    protected final Map<Integer, Sub> subs = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
 
     protected final Set<Task> priority = new TreeSet<>(new StartTimeComparator());
 
@@ -38,7 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void save(Epic epic) {
         int newId = generateId();
         epic.setId(newId);
-        epicTasks.put(newId, epic);
+        epics.put(newId, epic);
     }
 
     @Override
@@ -46,8 +46,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (isValid(sub)) {
             int newtId = generateId();
             sub.setId(newtId);
-            subTasks.put(newtId, sub);
-            Epic epic = epicTasks.get(sub.getEpicId());
+            subs.put(newtId, sub);
+            Epic epic = epics.get(sub.getEpicId());
             epic.addToSubTaskIds(newtId);
             setEpicTime(epic);
             setEpicStatus(epic);
@@ -68,39 +68,38 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void update(Epic epic) {
-        Epic savedEpic = epicTasks.get(epic.getId());
+        Epic savedEpic = epics.get(epic.getId());
         savedEpic.setName(epic.getName());
         savedEpic.setDescription(epic.getDescription());
-        epicTasks.put(savedEpic.getId(), savedEpic);
+        epics.put(savedEpic.getId(), savedEpic);
     }
 
     @Override
     public void update(Sub sub) {
         priority.removeIf(taskIn -> (taskIn.getId() == sub.getId()));
         if (isValid(sub)) {
-            subTasks.put(sub.getId(), sub);
+            subs.put(sub.getId(), sub);
             priority.add(sub);
-            setEpicStatus(epicTasks.get(sub.getEpicId()));
-            setEpicTime(epicTasks.get(sub.getEpicId()));
+            setEpicStatus(epics.get(sub.getEpicId()));
+            setEpicTime(epics.get(sub.getEpicId()));
         } else {
-            priority.add(subTasks.get(sub.getId()));
+            priority.add(subs.get(sub.getId()));
         }
     }
 
-    // Получение списка всех задач
     @Override
     public List<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public List<Sub> getSubTasks() {
-        return new ArrayList<>(subTasks.values());
+    public List<Sub> getSubs() {
+        return new ArrayList<>(subs.values());
     }
 
     @Override
-    public List<Epic> getEpicTasks() {
-        return new ArrayList<>(epicTasks.values());
+    public List<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
     }
 
     @Override
@@ -115,27 +114,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearAllSubTasks() {
-        for (Integer id : subTasks.keySet()) {
+        for (Integer id : subs.keySet()) {
             historyManager.remove(id);
-            priority.remove(subTasks.get(id));
+            priority.remove(subs.get(id));
         }
-        subTasks.clear();
-        epicTasks.forEach((key, value) -> value.getSubTaskIds().clear());
-        epicTasks.forEach((key, value) -> setEpicStatus(value));
-        epicTasks.forEach((key, value) -> value.setDuration(0));
+        subs.clear();
+        epics.forEach((key, value) -> value.getSubTaskIds().clear());
+        epics.forEach((key, value) -> setEpicStatus(value));
+        epics.forEach((key, value) -> value.setDuration(0));
     }
 
     @Override
     public void clearAllEpics() {
-        for (Integer id : subTasks.keySet()) {
+        for (Integer id : subs.keySet()) {
             historyManager.remove(id);
-            priority.remove(subTasks.get(id));
+            priority.remove(subs.get(id));
         }
-        for (Integer id : epicTasks.keySet()) {
+        for (Integer id : epics.keySet()) {
             historyManager.remove(id);
         }
-        subTasks.clear();
-        epicTasks.clear();
+        subs.clear();
+        epics.clear();
     }
 
     @Override
@@ -145,45 +144,45 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Sub getSubTaskById(int id) {
-        historyManager.add(subTasks.get(id));
-        return subTasks.get(id);
+    public Sub getSubById(int id) {
+        historyManager.add(subs.get(id));
+        return subs.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        historyManager.add(epicTasks.get(id));
-        return epicTasks.get(id);
+        historyManager.add(epics.get(id));
+        return epics.get(id);
     }
 
     @Override
     public void delTaskById(int id) {
         historyManager.remove(id);
-        priority.removeIf(taskIn -> (taskIn.getId() == id));
+        priority.removeIf(task -> (task.getId() == id));
         tasks.remove(id);
     }
 
     @Override
     public void delSubTaskById(int id) {
-        Epic epic = getEpicById(subTasks.get(id).getEpicId());
+        Epic epic = getEpicById(subs.get(id).getEpicId());
         epic.getSubTaskIds().removeIf(value -> (value == id));
-        priority.removeIf(taskIn -> (taskIn.getId() == id));
+        priority.removeIf(task -> (task.getId() == id));
         setEpicStatus(epic);
         setEpicTime(epic);
         historyManager.remove(id);
-        subTasks.remove(id);
+        subs.remove(id);
     }
 
     @Override
     public void delEpicById(int id) {
-        List<Integer> subTaskIds = epicTasks.get(id).getSubTaskIds();
+        List<Integer> subTaskIds = epics.get(id).getSubTaskIds();
         for (Integer subTaskId : subTaskIds) {
             historyManager.remove(subTaskId);
-            subTasks.remove(subTaskId);
-            priority.removeIf(taskIn -> (taskIn.getId() == subTaskId));
+            subs.remove(subTaskId);
+            priority.removeIf(task -> (task.getId() == subTaskId));
         }
         historyManager.remove(id);
-        epicTasks.remove(id);
+        epics.remove(id);
     }
 
 
@@ -194,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             HashSet<Status> subStatuses = new HashSet<>();
             for (Integer subTaskId : epic.getSubTaskIds()) {
-                subStatuses.add(subTasks.get(subTaskId).getStatus());
+                subStatuses.add(subs.get(subTaskId).getStatus());
             }
             if (subStatuses.size() > 1) {
                 epic.setStatus(Status.IN_PROGRESS);
@@ -210,15 +209,17 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setEndTime(null);
             epic.setDuration(0);
         } else {
-            List<Sub> listOfEpicSubs = subTasks.values()
+            List<Sub> listOfEpicSubs = subs.values()
                     .stream().filter(value -> value.getEpicId() == epic.getId())
                     .collect(Collectors.toList());
             epic.setStartTime(listOfEpicSubs.stream()
                     .map(Task::getStartTime)
+                    .filter(startTime -> Optional.ofNullable(startTime).isPresent())
                     .min(LocalDateTime::compareTo)
                     .orElse(null));
             epic.setEndTime(listOfEpicSubs.stream()
                     .map(Task::getEndTime)
+                    .filter(epicTime -> Optional.ofNullable(epicTime).isPresent())
                     .max(LocalDateTime::compareTo)
                     .orElse(null));
             epic.setDuration(listOfEpicSubs.stream()
@@ -239,25 +240,27 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private boolean isValid(Task task) {
-        boolean isPossible = true;
-        if (Optional.ofNullable(task.getStartTime()).isPresent()) {
-            LocalDateTime expectStart = task.getStartTime();
-            LocalDateTime expectEnd = task.getEndTime();
-            for (Task existTask : priority) {
-                LocalDateTime startOfBusyTime = existTask.getStartTime();
-                LocalDateTime endOfBusyTime = existTask.getEndTime();
-                //Если вы нашли пересечение по времени хоть с одной задачей, можно дальше не искать, а делать break цикла
-                boolean isPossibleBefore = expectStart.isBefore(startOfBusyTime) &&
-                        (expectEnd.isBefore(startOfBusyTime) || expectEnd.isEqual(startOfBusyTime));
-                boolean isPossibleAfter = expectStart.isAfter(endOfBusyTime) || expectStart.isEqual(endOfBusyTime);
-                if (isPossibleBefore == isPossibleAfter) {
-                    isPossible = false;
-                    break;
+        if (Optional.ofNullable(task.getStartTime()).isPresent() && !priority.isEmpty()) {
+            List<Task> listOfTasksAreSetStartTime = priority.stream()
+                    .filter(t -> Optional.ofNullable(t.getStartTime()).isPresent())
+                    .collect(Collectors.toList());
+            if (!listOfTasksAreSetStartTime.isEmpty()) {
+                LocalDateTime expectStart = task.getStartTime();
+                LocalDateTime expectEnd = task.getEndTime();
+                for (Task existTask : listOfTasksAreSetStartTime) {
+                    LocalDateTime startOfBusyTime = existTask.getStartTime();
+                    LocalDateTime endOfBusyTime = existTask.getEndTime();
+                    boolean isPossibleBefore = expectStart.isBefore(startOfBusyTime) &&
+                            (expectEnd.isBefore(startOfBusyTime) || expectEnd.isEqual(startOfBusyTime));
+                    boolean isPossibleAfter = expectStart.isAfter(endOfBusyTime) || expectStart.isEqual(endOfBusyTime);
+                    if (isPossibleBefore == isPossibleAfter) {
+                        System.err.println(
+                                "WARNING! Time is busy: task named \"" + task.getName() + "\" hasn't be saved.");
+                        return false;
+                    }
                 }
             }
-            if (!(isPossible)) System.err.println(
-                    "WARNING! Time is busy: task named \"" + task.getName() + "\" hasn't be saved.");
         }
-        return isPossible;
+        return true;
     }
 }

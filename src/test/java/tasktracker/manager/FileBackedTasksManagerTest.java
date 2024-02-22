@@ -18,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     @BeforeEach
     public void setManager() {
-        File file = new File("test.csv");
-        manager = new FileBackedTasksManager(file);
+        manager = new FileBackedTasksManager("test.csv");
     }
 
     private final Task task = new Task(
@@ -63,13 +62,13 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
                 manager.getTaskById(taskIn.getId());
             }
         }
-        if (!(manager.getSubTasks().isEmpty())) {
-            for (Sub subIn : manager.getSubTasks()) {
-                manager.getSubTaskById(subIn.getId());
+        if (!(manager.getSubs().isEmpty())) {
+            for (Sub subIn : manager.getSubs()) {
+                manager.getSubById(subIn.getId());
             }
         }
-        if (!(manager.getEpicTasks().isEmpty())) {
-            for (Epic epicIn : manager.getEpicTasks()) {
+        if (!(manager.getEpics().isEmpty())) {
+            for (Epic epicIn : manager.getEpics()) {
                 manager.getEpicById(epicIn.getId());
             }
         }
@@ -82,12 +81,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.save(task);
         makeHistory();
         FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
-                .loadFromFile(new File("test.csv"));
+                .load(new File("test.csv"));
         int[] history = makeArrayOfIdsOutOfTaskList(manager.getHistory());
         int[] loadedHistory = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getHistory());
         int[] priorityArray = makeArrayOfIdsOutOfTaskList(manager.getPrioritizedTasks());
         int[] loadedPriorityArray = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getPrioritizedTasks());
-        Epic loadedEpic = fileBackedTasksManager.getEpicTasks().get(0);
+        Epic loadedEpic = fileBackedTasksManager.getEpics().get(0);
         assertFalse(fileBackedTasksManager.getHistory().isEmpty());
         assertTrue(isSameTaskVariables(epic, loadedEpic));
         assertEquals(epic.getSubTaskIds(), loadedEpic.getSubTaskIds());
@@ -95,7 +94,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         assertArrayEquals(priorityArray, loadedPriorityArray);
         Task loadedTask = fileBackedTasksManager.getTasks().get(0);
         assertTrue(isSameTaskVariables(task, loadedTask));
-        Sub loadedSub = fileBackedTasksManager.getSubTasks().get(0);
+        Sub loadedSub = fileBackedTasksManager.getSubs().get(0);
         assertTrue(isSameTaskVariables(sub, loadedSub));
         assertEquals(sub.getEpicId(), loadedSub.getEpicId());
     }
@@ -106,8 +105,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.save(task);
         makeHistory();
         FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
-                .loadFromFile(new File("test.csv"));
-        Epic loadedEpic = fileBackedTasksManager.getEpicTasks().get(0);
+                .load(new File("test.csv"));
+        Epic loadedEpic = fileBackedTasksManager.getEpics().get(0);
         int[] history = makeArrayOfIdsOutOfTaskList(manager.getHistory());
         int[] loadedHistory = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getHistory());
         int[] priorityArray = makeArrayOfIdsOutOfTaskList(manager.getPrioritizedTasks());
@@ -118,7 +117,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         assertArrayEquals(priorityArray, loadedPriorityArray);
         Task loadedTask = fileBackedTasksManager.getTasks().get(0);
         assertTrue(isSameTaskVariables(task, loadedTask));
-        assertTrue(fileBackedTasksManager.getSubTasks().isEmpty());
+        assertTrue(fileBackedTasksManager.getSubs().isEmpty());
         assertTrue(loadedEpic.getSubTaskIds().isEmpty());
     }
 
@@ -127,8 +126,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.save(epic);
         manager.save(sub);
         FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
-                .loadFromFile(new File("test.csv"));
-        Epic loadedEpic = fileBackedTasksManager.getEpicTasks().get(0);
+                .load(new File("test.csv"));
+        Epic loadedEpic = fileBackedTasksManager.getEpics().get(0);
         int[] history = makeArrayOfIdsOutOfTaskList(manager.getHistory());
         int[] loadedHistory = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getHistory());
         int[] priorityArray = makeArrayOfIdsOutOfTaskList(manager.getPrioritizedTasks());
@@ -138,8 +137,35 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         assertArrayEquals(history, loadedHistory);
         assertArrayEquals(priorityArray, loadedPriorityArray);
         assertTrue(fileBackedTasksManager.getTasks().isEmpty());
-        Sub loadedSub = fileBackedTasksManager.getSubTasks().get(0);
+        Sub loadedSub = fileBackedTasksManager.getSubs().get(0);
         assertTrue(isSameTaskVariables(sub, loadedSub));
         assertEquals(sub.getEpicId(), loadedSub.getEpicId());
+    }
+    @Test
+    public void shouldSaveAndLoadTaskWithStartTimeNull() {
+        Task savedTask = new Task("T", "without start time", Status.NEW, null, 10);
+        manager.save(savedTask);
+        FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
+                .load(new File("test.csv"));
+        Task loadedTask = fileBackedTasksManager.getTaskById(1);
+        assertTrue(isSameTaskVariables(savedTask, loadedTask));
+    }
+
+    @Test
+    public void shouldSaveAndLoadSubsWithStartTimeNullAndCorrectCalculateDurationAndTimePointsOfEpic() {
+        manager.save(epic);
+        manager.save(sub);
+        manager.save(new Sub("sub", "without start time", Status.NEW, null, 10, 1));
+        manager.save(new Task("sub", "without start time", Status.NEW, null, 10));
+        FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
+                .load(new File("test.csv"));
+        Epic loadedEpic = fileBackedTasksManager.getEpicById(1);
+        for (Task value : fileBackedTasksManager.tasks.values()) {
+            assertNull(value.getStartTime());
+        }
+        assertEquals(20, loadedEpic.getDuration());
+        assertEquals(loadedEpic.getStartTime(), sub.getStartTime());
+        assertEquals(loadedEpic.getEndTime(), sub.getEndTime());
+
     }
 }

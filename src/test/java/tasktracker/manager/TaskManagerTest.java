@@ -52,7 +52,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void save_Epic_shouldSaveEpicWithoutSubsWithRightIdStatusTimeValues() {
         manager.save(epic);
-        Epic savedTask = manager.getEpicTasks().get(0);
+        Epic savedTask = manager.getEpics().get(0);
         assertEquals(1, savedTask.getId());
         assertEquals(epic, savedTask);
         assertEquals(Status.NEW, savedTask.getStatus());
@@ -69,7 +69,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.save(epic);
         manager.save(sub);
         Epic changedEpic = manager.getEpicById(1);
-        Sub savedSub = manager.getSubTaskById(2);
+        Sub savedSub = manager.getSubById(2);
         assertEquals(2, savedSub.getId());
         assertEquals(Status.IN_PROGRESS, savedSub.getStatus());
         assertEquals(Status.IN_PROGRESS, savedSub.getStatus());
@@ -120,11 +120,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public void update_sub_shouldRePutSubWithSameId() {
         manager.save(epic);
         manager.save(sub);
-        Status oldStatus = manager.getSubTaskById(2).getStatus();
+        Status oldStatus = manager.getSubById(2).getStatus();
         sub.setStatus(Status.DONE);
         manager.update(sub);
-        assertNotEquals(oldStatus, manager.getSubTaskById(2).getStatus());
-        assertEquals(2, manager.getSubTasks().get(0).getId());
+        assertNotEquals(oldStatus, manager.getSubById(2).getStatus());
+        assertEquals(2, manager.getSubs().get(0).getId());
     }
 
     @DisplayName("GIVEN try to use methods getTask or getSubs or getEpics "
@@ -133,12 +133,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getTasksSubsOrEpics_shouldReturnRightTasksOrSubsOrEpicsList() {
         assertTrue(manager.getTasks().isEmpty());
-        assertTrue(manager.getSubTasks().isEmpty());
-        assertTrue(manager.getEpicTasks().isEmpty());
+        assertTrue(manager.getSubs().isEmpty());
+        assertTrue(manager.getEpics().isEmpty());
         manager.save(epic);
-        assertEquals(1, manager.getEpicTasks().size());
+        assertEquals(1, manager.getEpics().size());
         manager.save(sub);
-        assertEquals(1, manager.getSubTasks().size());
+        assertEquals(1, manager.getSubs().size());
         manager.save(task);
         assertEquals(1, manager.getTasks().size());
     }
@@ -154,9 +154,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.clearAllTasks();
         assertTrue(manager.getTasks().isEmpty());
         manager.clearAllSubTasks();
-        assertTrue(manager.getSubTasks().isEmpty());
+        assertTrue(manager.getSubs().isEmpty());
         manager.clearAllEpics();
-        assertTrue(manager.getEpicTasks().isEmpty());
+        assertTrue(manager.getEpics().isEmpty());
     }
 
     @DisplayName("if epics clear it's subs must be clear too")
@@ -165,19 +165,19 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.save(epic);
         manager.save(sub);
         manager.clearAllEpics();
-        assertTrue(manager.getSubTasks().isEmpty());
+        assertTrue(manager.getSubs().isEmpty());
     }
 
     @Test
     public void getTaskOrSubOrEpicById_shouldReturnRightTaskOrNull() {
         assertNull(manager.getTaskById(1));
-        assertNull(manager.getSubTaskById(1));
+        assertNull(manager.getSubById(1));
         assertNull(manager.getEpicById(1));
         manager.save(epic);
         manager.save(sub);
         manager.save(task);
         assertEquals(task, manager.getTaskById(3));
-        assertEquals(sub, manager.getSubTaskById(2));
+        assertEquals(sub, manager.getSubById(2));
         assertEquals(epic, manager.getEpicById(1));
     }
 
@@ -193,7 +193,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.save(epic);
         manager.save(sub);
         manager.delSubTaskById(2);
-        assertNull(manager.getSubTaskById(2));
+        assertNull(manager.getSubById(2));
     }
 
     @Test
@@ -202,7 +202,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.save(sub);
         manager.delEpicById(1);
         assertNull(manager.getEpicById(1));
-        assertNull(manager.getSubTaskById(2));
+        assertNull(manager.getSubById(2));
     }
 
     @Test
