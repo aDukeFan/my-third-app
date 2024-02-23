@@ -1,11 +1,11 @@
-package tasktracker.Internet;
+package tasktracker.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.*;
 import tasktracker.ManagerSaveException;
 import tasktracker.manager.FileBackedTasksManager;
+import tasktracker.manager.Managers;
 import tasktracker.model.Epic;
 import tasktracker.model.Sub;
 import tasktracker.model.Task;
@@ -17,15 +17,15 @@ import java.util.regex.Pattern;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
-    private static final Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
-    private static HttpServer server;
+    private final HttpServer server;
 
-    public static void setManager(FileBackedTasksManager manager) {
-        HttpTaskServer.manager = manager;
+    public FileBackedTasksManager getManager() {
+        return manager;
     }
 
-    public static FileBackedTasksManager manager;
+    private final FileBackedTasksManager manager = Managers.getDefaultFileBackedTasksManager();
 
 
     public HttpTaskServer() throws IOException {
@@ -44,6 +44,10 @@ public class HttpTaskServer {
     }
 
     private void handle(HttpExchange exchange) {
+        /*TODO Нужно использовать try with resources
+          у меня метод handle принимает HttpExchange, который не autocloseable,
+          тогда как мне использовать try with resources?
+         */
         try {
             String path = exchange.getRequestURI().getPath();
             String requestMethod = exchange.getRequestMethod();
@@ -61,7 +65,7 @@ public class HttpTaskServer {
                     System.out.println("invalid method " + requestMethod);
                     exchange.sendResponseHeaders(405, 0);
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             throw new ManagerSaveException("WASTED...");
         } finally {
             exchange.close();
@@ -232,7 +236,7 @@ public class HttpTaskServer {
             String json = new String(exchange.getRequestBody().readAllBytes());
             try {
                 gson.fromJson(json, Epic.class);
-            } catch (JsonSyntaxException e) {
+            } catch (JsonSyntaxException exception) {
                 writeResponse(exchange,
                         "Invalid json format",
                         400);
@@ -248,7 +252,7 @@ public class HttpTaskServer {
     private int parsePathId(String pathId) {
         try {
             return Integer.parseInt(pathId);
-        } catch (NullPointerException e) {
+        } catch (NullPointerException exception) {
             return -1;
         }
     }

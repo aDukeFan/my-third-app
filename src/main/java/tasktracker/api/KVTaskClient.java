@@ -1,4 +1,4 @@
-package tasktracker.Internet;
+package tasktracker.api;
 
 import tasktracker.ManagerSaveException;
 
@@ -12,6 +12,8 @@ public class KVTaskClient {
     private final String apiToken;
 
     private final HttpClient client;
+
+    private static final String localHost = "http://localhost:8078";
 
     public KVTaskClient(String url) {
         try {
@@ -34,7 +36,7 @@ public class KVTaskClient {
 
     public void put(String key, String json) {
         try {
-            String url = "http://localhost:8078/save/" + key + "?API_TOKEN=" + apiToken;
+            String url = localHost + "/save/" + key + "?API_TOKEN=" + apiToken;
             URI uri = URI.create(url);
             HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -42,14 +44,14 @@ public class KVTaskClient {
                     .uri(uri)
                     .build();
             client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException exception) {
             System.out.println("put is WASTED...");
         }
     }
 
     public String load(String key) {
         try {
-            String url = "http://localhost:8078/load/" + key + "?API_TOKEN=" + apiToken;
+            String url = localHost + "/load/" + key + "?API_TOKEN=" + apiToken;
 
             URI uri = URI.create(url);
             HttpRequest request = HttpRequest.newBuilder()
@@ -58,7 +60,7 @@ public class KVTaskClient {
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException exception) {
             System.out.println("load is WASTED...");
             return null;
         }

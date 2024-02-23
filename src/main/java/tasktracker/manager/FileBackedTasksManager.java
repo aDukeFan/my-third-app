@@ -15,7 +15,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTasksManager load(File file) {
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager("history.csv");
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager("fileBackedTasksManagerData.csv");
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             List<String> linesCollection = new ArrayList<>();

@@ -10,7 +10,6 @@ import tasktracker.model.Task;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,17 +37,15 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
             10,
             1);
 
-    private boolean isSameTaskVariables(Task o1, Task o2) {
-        boolean id = o1.getId() == o2.getId();
-        boolean type = o1.getType().equals(o2.getType());
-        boolean name = Objects.equals(o1.getName(), o2.getName());
-        boolean status = o1.getStatus().equals(o2.getStatus());
-        boolean description = Objects.equals(o1.getDescription(), o2.getDescription());
-        boolean startTime = Optional.ofNullable(o1.getStartTime()).equals(Optional.ofNullable(o2.getStartTime()));
-        boolean duration = o1.getDuration() == o2.getDuration();
-        boolean endTime = Optional.ofNullable(o1.getEndTime()).equals(Optional.ofNullable(o2.getEndTime()));
-        return id && type && name && status && description && startTime && duration && endTime;
-
+    private void isSameTaskVariables(Task o1, Task o2) {
+        assertEquals(o1.getId(), o2.getId());
+        assertEquals(o1.getType(), o2.getType());
+        assertEquals(o1.getName(), o2.getName());
+        assertEquals(o1.getStatus(), o2.getStatus());
+        assertEquals(o1.getDescription(), o2.getDescription());
+        assertEquals(Optional.ofNullable(o1.getStartTime()), Optional.ofNullable(o2.getStartTime()));
+        assertEquals(o1.getDuration(), o2.getDuration());
+        assertEquals(Optional.ofNullable(o1.getEndTime()), Optional.ofNullable(o2.getEndTime()));
     }
 
     private int[] makeArrayOfIdsOutOfTaskList(List<Task> list) {
@@ -88,14 +85,14 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         int[] loadedPriorityArray = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getPrioritizedTasks());
         Epic loadedEpic = fileBackedTasksManager.getEpics().get(0);
         assertFalse(fileBackedTasksManager.getHistory().isEmpty());
-        assertTrue(isSameTaskVariables(epic, loadedEpic));
+        isSameTaskVariables(epic, loadedEpic);
         assertEquals(epic.getSubTaskIds(), loadedEpic.getSubTaskIds());
         assertArrayEquals(history, loadedHistory);
         assertArrayEquals(priorityArray, loadedPriorityArray);
         Task loadedTask = fileBackedTasksManager.getTasks().get(0);
-        assertTrue(isSameTaskVariables(task, loadedTask));
+        isSameTaskVariables(task, loadedTask);
         Sub loadedSub = fileBackedTasksManager.getSubs().get(0);
-        assertTrue(isSameTaskVariables(sub, loadedSub));
+        isSameTaskVariables(sub, loadedSub);
         assertEquals(sub.getEpicId(), loadedSub.getEpicId());
     }
 
@@ -111,12 +108,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         int[] loadedHistory = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getHistory());
         int[] priorityArray = makeArrayOfIdsOutOfTaskList(manager.getPrioritizedTasks());
         int[] loadedPriorityArray = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getPrioritizedTasks());
-        assertTrue(isSameTaskVariables(epic, loadedEpic));
+        isSameTaskVariables(epic, loadedEpic);
         assertEquals(epic.getSubTaskIds(), loadedEpic.getSubTaskIds());
         assertArrayEquals(history, loadedHistory);
         assertArrayEquals(priorityArray, loadedPriorityArray);
         Task loadedTask = fileBackedTasksManager.getTasks().get(0);
-        assertTrue(isSameTaskVariables(task, loadedTask));
+        isSameTaskVariables(task, loadedTask);
         assertTrue(fileBackedTasksManager.getSubs().isEmpty());
         assertTrue(loadedEpic.getSubTaskIds().isEmpty());
     }
@@ -132,13 +129,13 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         int[] loadedHistory = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getHistory());
         int[] priorityArray = makeArrayOfIdsOutOfTaskList(manager.getPrioritizedTasks());
         int[] loadedPriorityArray = makeArrayOfIdsOutOfTaskList(fileBackedTasksManager.getPrioritizedTasks());
-        assertTrue(isSameTaskVariables(epic, loadedEpic));
+        isSameTaskVariables(epic, loadedEpic);
         assertEquals(epic.getSubTaskIds(), loadedEpic.getSubTaskIds());
         assertArrayEquals(history, loadedHistory);
         assertArrayEquals(priorityArray, loadedPriorityArray);
         assertTrue(fileBackedTasksManager.getTasks().isEmpty());
         Sub loadedSub = fileBackedTasksManager.getSubs().get(0);
-        assertTrue(isSameTaskVariables(sub, loadedSub));
+        isSameTaskVariables(sub, loadedSub);
         assertEquals(sub.getEpicId(), loadedSub.getEpicId());
     }
     @Test
@@ -148,7 +145,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
                 .load(new File("test.csv"));
         Task loadedTask = fileBackedTasksManager.getTaskById(1);
-        assertTrue(isSameTaskVariables(savedTask, loadedTask));
+        isSameTaskVariables(savedTask, loadedTask);
     }
 
     @Test

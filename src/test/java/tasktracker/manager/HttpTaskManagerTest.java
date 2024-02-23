@@ -3,7 +3,7 @@ package tasktracker.manager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tasktracker.Internet.KVServer;
+import tasktracker.api.KVServer;
 import tasktracker.model.Epic;
 import tasktracker.model.Status;
 import tasktracker.model.Sub;
@@ -27,7 +27,7 @@ class HttpTaskManagerTest {
     public void setServerAndManager() throws IOException {
         this.server = new KVServer();
         server.start();
-        this.manager = Managers.getDefaultHttpTaskManager();
+        this.manager = Managers.getDefault();
     }
     @AfterEach
     public void serverStop() {
@@ -58,21 +58,20 @@ class HttpTaskManagerTest {
             10,
             3);
 
-    private boolean isSameTaskVariables(Task o1, Task o2) {
-        boolean id = o1.getId() == o2.getId();
-        boolean type = o1.getType().equals(o2.getType());
-        boolean name = Objects.equals(o1.getName(), o2.getName());
-        boolean status = o1.getStatus().equals(o2.getStatus());
-        boolean description = Objects.equals(o1.getDescription(), o2.getDescription());
-        boolean startTime = Optional.ofNullable(o1.getStartTime()).equals(Optional.ofNullable(o2.getStartTime()));
-        boolean duration = o1.getDuration() == o2.getDuration();
-        boolean endTime = Optional.ofNullable(o1.getEndTime()).equals(Optional.ofNullable(o2.getEndTime()));
-        return id && type && name && status && description && startTime && duration && endTime;
+    private void isSameTaskVariables(Task o1, Task o2) {
+        assertEquals(o1.getId(), o2.getId());
+        assertEquals(o1.getType(), o2.getType());
+        assertEquals(o1.getName(), o2.getName());
+        assertEquals(o1.getStatus(), o2.getStatus());
+        assertEquals(o1.getDescription(), o2.getDescription());
+        assertEquals(Optional.ofNullable(o1.getStartTime()), Optional.ofNullable(o2.getStartTime()));
+        assertEquals(o1.getDuration(), o2.getDuration());
+        assertEquals(Optional.ofNullable(o1.getEndTime()), Optional.ofNullable(o2.getEndTime()));
     }
 
 
     @Test
-    void loads() throws IOException {
+    void loads() {
         manager.save(firstTask);
         manager.save(secondTask);
         manager.save(epic);
@@ -83,7 +82,7 @@ class HttpTaskManagerTest {
 
         manager.saveToServer();
 
-        HttpTaskManager loadManager = HttpTaskManager.loads("http://localhost:8078/register");
+        HttpTaskManager loadManager = HttpTaskManager.loadFromServer("http://localhost:8078/register");
         assertIterableEquals(
                 manager.getHistory().stream().map(Task::getId).collect(Collectors.toList()),
                 loadManager.getHistory().stream().map(Task::getId).collect(Collectors.toList()));
@@ -91,10 +90,10 @@ class HttpTaskManagerTest {
                 manager.getPrioritizedTasks().stream().map(Task::getId).collect(Collectors.toList()),
                 loadManager.getPrioritizedTasks().stream().map(Task::getId).collect(Collectors.toList()));
 
-        assertTrue(isSameTaskVariables(firstTask, loadManager.getTaskById(1)));
-        assertTrue(isSameTaskVariables(secondTask, loadManager.getTaskById(2)));
-        assertTrue(isSameTaskVariables(sub, loadManager.getSubById(4)));
-        assertTrue(isSameTaskVariables(epic, loadManager.getEpicById(3)));
+        isSameTaskVariables(firstTask, loadManager.getTaskById(1));
+        isSameTaskVariables(secondTask, loadManager.getTaskById(2));
+        isSameTaskVariables(sub, loadManager.getSubById(4));
+        isSameTaskVariables(epic, loadManager.getEpicById(3));
         Task taskFive = new Task("TaskFive", "test ID", Status.IN_PROGRESS, LocalDateTime.of(2025, 1, 1, 1, 1),
                 10);
         manager.save(taskFive);
