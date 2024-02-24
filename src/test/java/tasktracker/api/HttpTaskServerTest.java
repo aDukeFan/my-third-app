@@ -204,6 +204,16 @@ class HttpTaskServerTest {
     }
 
     @Test
+    public void shouldDeleteAllTypesTasks() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder().DELETE().uri(makeUri("clear")).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+        assertTrue(manager.getTasks().isEmpty());
+        assertTrue(manager.getEpics().isEmpty());
+        assertTrue(manager.getSubs().isEmpty());
+    }
+
+    @Test
     public void shouldDeleteTaskById() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder().DELETE().uri(makeUri("task/?id=2")).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -238,7 +248,7 @@ class HttpTaskServerTest {
         firstTask.setId(5);
         String json = gson.toJson(firstTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder().POST(body).uri(makeUri("task/make")).build();
+        HttpRequest request = HttpRequest.newBuilder().POST(body).uri(makeUri("task")).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
         isSameTaskVariables(firstTask, manager.getTaskById(5));
@@ -253,7 +263,7 @@ class HttpTaskServerTest {
         secondSub.setId(5);
         String json = gson.toJson(secondSub);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder().POST(body).uri(makeUri("sub/make")).build();
+        HttpRequest request = HttpRequest.newBuilder().POST(body).uri(makeUri("sub")).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
         isSameTaskVariables(secondSub, manager.getSubById(5));
@@ -266,7 +276,7 @@ class HttpTaskServerTest {
         secondEpic.setId(5);
         String json = gson.toJson(secondEpic);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder().POST(body).uri(makeUri("epic/make")).build();
+        HttpRequest request = HttpRequest.newBuilder().POST(body).uri(makeUri("epic")).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
         isSameTaskVariables(secondEpic, manager.getEpicById(5));

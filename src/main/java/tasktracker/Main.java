@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         KVServer server = new KVServer();
         server.start();
         HttpTaskManager manager = Managers.getDefault();
@@ -32,8 +32,8 @@ public class Main {
         Epic firstEpic = new Epic("First epic",
                 "test");
         manager.save(firstEpic);
-        Epic secondEpic = new Epic("Second epic",
-                "will be without subs");
+        Epic secondEpic = new Epic("Second epic (without subs)",
+                "test");
         manager.save(secondEpic);
         Sub sub = new Sub("Sub",
                 "test",
@@ -53,27 +53,33 @@ public class Main {
         //4. Проверяю, что все задачи, эпики, подзадачи, которые были в старом, есть в новом менеджере:
         System.out.println("\n--- Задачи созданного менеджера ---");
         for (Task task : manager.getTasks()) {
-            System.out.println(task.getId() + " " + task.getName());
+            System.out.println(task.getId() + " " + task.getName()
+                    + " начинается в " + task.getStartTime());
         }
         System.out.println("--- Задачи загруженного менеджера ---");
         for (Task task : loadManager.getTasks()) {
-            System.out.println(task.getId() + " " + task.getName());
+            System.out.println(task.getId() + " " + task.getName()
+                    + " начинается в " + task.getStartTime());
         }
         System.out.println("\n--- Эпики созданного менеджера ---");
         for (Epic task : manager.getEpics()) {
-            System.out.println(task.getId() + " " + task.getName());
+            System.out.println(task.getId() + " " + task.getName()
+                    + " начинается в " + task.getStartTime());
         }
         System.out.println("--- Эпики загруженного менеджера ---");
         for (Epic task : loadManager.getEpics()) {
-            System.out.println(task.getId() + " " + task.getName());
+            System.out.println(task.getId() + " " + task.getName()
+                    + " начинается в " + task.getStartTime());
         }
         System.out.println("\n--- Подзадачи созданного менеджера ---");
         for (Sub task : manager.getSubs()) {
-            System.out.println(task.getId() + " " + task.getName() + " " + task.getEpicId());
+            System.out.println(task.getId() + " " + task.getName() + " " + task.getEpicId()
+                    + " начинается в " + task.getStartTime());
         }
         System.out.println("--- Подзадачи загруженного менеджера ---");
         for (Sub task : loadManager.getSubs()) {
-            System.out.println(task.getId() + " " + task.getName() + " " + task.getEpicId());
+            System.out.println(task.getId() + " " + task.getName() + " " + task.getEpicId()
+                    + " начинается в " + task.getStartTime());
         }
 
         // Проверяю, что история просмотра восстановилась верно:
@@ -94,10 +100,6 @@ public class Main {
         for (Task task : loadManager.getPrioritizedTasks()) {
             System.out.println(task.getId() + " " + task.getName());
         }
-
-
-
-
         server.stop();
     }
 }
