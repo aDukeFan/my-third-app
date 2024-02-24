@@ -32,7 +32,7 @@ class HttpTaskServerTest {
     private HttpTaskServer server;
     private FileBackedTasksManager manager;
 
-    private static final String hostUrl = "http://localhost:8080/tasks/";
+    private static final String LOCAL_HOST_TASKS = "http://localhost:8080/tasks/";
 
     @BeforeEach
     public void makeTasks() {
@@ -84,7 +84,7 @@ class HttpTaskServerTest {
     }
 
     private URI makeUri(String handle) {
-        return URI.create(hostUrl + handle);
+        return URI.create(LOCAL_HOST_TASKS + handle);
     }
 
     @Test

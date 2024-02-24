@@ -13,7 +13,7 @@ public class KVTaskClient {
 
     private final HttpClient client;
 
-    private static final String localHost = "http://localhost:8078";
+    private static final String LOCAL_HOST = "http://localhost:8078";
 
     public KVTaskClient(String url) {
         try {
@@ -36,7 +36,7 @@ public class KVTaskClient {
 
     public void put(String key, String json) {
         try {
-            String url = localHost + "/save/" + key + "?API_TOKEN=" + apiToken;
+            String url = LOCAL_HOST + "/save/" + key + "?API_TOKEN=" + apiToken;
             URI uri = URI.create(url);
             HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -51,7 +51,7 @@ public class KVTaskClient {
 
     public String load(String key) {
         try {
-            String url = localHost + "/load/" + key + "?API_TOKEN=" + apiToken;
+            String url = LOCAL_HOST + "/load/" + key + "?API_TOKEN=" + apiToken;
 
             URI uri = URI.create(url);
             HttpRequest request = HttpRequest.newBuilder()

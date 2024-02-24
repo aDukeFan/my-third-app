@@ -44,10 +44,6 @@ public class HttpTaskServer {
     }
 
     private void handle(HttpExchange exchange) {
-        /*TODO Нужно использовать try with resources
-          у меня метод handle принимает HttpExchange, который не autocloseable,
-          тогда как мне использовать try with resources?
-         */
         try {
             String path = exchange.getRequestURI().getPath();
             String requestMethod = exchange.getRequestMethod();
@@ -67,8 +63,6 @@ public class HttpTaskServer {
             }
         } catch (Exception exception) {
             throw new ManagerSaveException("WASTED...");
-        } finally {
-            exchange.close();
         }
     }
 
