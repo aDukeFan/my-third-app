@@ -1,6 +1,10 @@
 package tasktracker.manager;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import tasktracker.api.GsonMaker;
 import tasktracker.api.KVTaskClient;
 import tasktracker.model.Epic;
 import tasktracker.model.Sub;
@@ -13,7 +17,7 @@ import java.util.List;
 
 public class HttpTaskManager extends FileBackedTasksManager {
 
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonMaker().makeSpesialGson();
 
     private final KVTaskClient client;
 
@@ -22,7 +26,6 @@ public class HttpTaskManager extends FileBackedTasksManager {
         this.client = new KVTaskClient(urlToKVServer);
 
     }
-
 
     public void saveToServer() {
         client.put("tasks", gson.toJson(getTasks()));
@@ -34,7 +37,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
     public static HttpTaskManager loadFromServer(String url) {
         HttpTaskManager manager = new HttpTaskManager(url);
         JsonArray jsonTasksArray = JsonParser.parseString(manager.client.load("tasks")).getAsJsonArray();
-        Gson gson = new Gson();
+        Gson gson = new GsonMaker().makeSpesialGson();
         for (JsonElement element : jsonTasksArray) {
             Task task = gson.fromJson(element, Task.class);
             manager.tasks.put(task.getId(), task);

@@ -3,10 +3,10 @@ package tasktracker.manager;
 import tasktracker.model.Node;
 import tasktracker.model.Task;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
 

@@ -68,7 +68,6 @@ class HttpTaskManagerTest {
         assertEquals(Optional.ofNullable(o1.getEndTime()), Optional.ofNullable(o2.getEndTime()));
     }
 
-
     @Test
     void loads() {
         manager.save(firstTask);
@@ -93,10 +92,11 @@ class HttpTaskManagerTest {
         isSameTaskVariables(secondTask, loadManager.getTaskById(2));
         isSameTaskVariables(sub, loadManager.getSubById(4));
         isSameTaskVariables(epic, loadManager.getEpicById(3));
-        Task taskFive = new Task("TaskFive", "test ID", Status.IN_PROGRESS, LocalDateTime.of(2025, 1, 1, 1, 1),
-                10);
+        Task taskFive = new Task("TaskFive",
+                "test ID",
+                Status.IN_PROGRESS,
+                LocalDateTime.of(2025, 1, 1, 1, 1), 10);
         manager.save(taskFive);
         assertEquals(manager.getTaskById(5).getName(), taskFive.getName());
-
     }
 }

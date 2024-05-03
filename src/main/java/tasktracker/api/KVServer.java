@@ -1,18 +1,15 @@
 package tasktracker.api;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-/**
- * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
- */
 public class KVServer {
     private static final int PORT = 8078;
     private final String apiToken;
@@ -28,10 +25,10 @@ public class KVServer {
     }
 
     private void load(HttpExchange exchange) throws IOException {
-        try {
+        try (exchange) {
             System.out.println("\n/load");
-            if (!isAuthorized(exchange)) {
-                System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+            if (isAuthorized(exchange)) {
+                System.out.println("parameter of query API_TOKEN is not found");
                 exchange.sendResponseHeaders(403, 0);
                 return;
             }
@@ -39,83 +36,77 @@ public class KVServer {
                 String key = exchange.getRequestURI().getPath().substring("/load/".length());
                 System.out.println(key);
                 if (key.isEmpty()) {
-                    System.out.println("Key для загрузки пустой. key указывается в пути: /load/{key}");
+                    System.out.println("Key is empty, please, write key: /load/{key}");
                     exchange.sendResponseHeaders(400, 0);
                     return;
                 }
                 if (data.containsKey(key)) {
                     sendText(exchange, data.get(key));
-                    System.out.println("Значение для ключа " + key + " успешно передано!");
+                    System.out.println("the value for the key has been successfully transmitted: " + key);
                     exchange.sendResponseHeaders(200, 0);
                 } else {
-                    sendText(exchange, "Нет такого ключа: " + key);
+                    sendText(exchange, "No such key: " + key);
                     exchange.sendResponseHeaders(400, 0);
                 }
             } else {
-                System.out.println("/load ждёт GET-запрос, а получил: " + exchange.getRequestMethod());
+                System.out.println("/load request must be GET, but " + exchange.getRequestMethod());
                 exchange.sendResponseHeaders(405, 0);
             }
-        } finally {
-            exchange.close();
         }
     }
 
     private void save(HttpExchange exchange) throws IOException {
-        try {
+        try (exchange) {
             System.out.println("\n/save");
-            if (!isAuthorized(exchange)) {
-                System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+            if (isAuthorized(exchange)) {
+                System.out.println("parameter of query API_TOKEN is not found");
                 exchange.sendResponseHeaders(403, 0);
                 return;
             }
             if ("POST".equals(exchange.getRequestMethod())) {
                 String key = exchange.getRequestURI().getPath().substring("/save/".length());
                 if (key.isEmpty()) {
-                    System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
+                    System.out.println("Key is empty, please, write key: /save/{key}");
                     exchange.sendResponseHeaders(400, 0);
                     return;
                 }
                 String value = readText(exchange);
                 if (value.isEmpty()) {
-                    System.out.println("Value для сохранения пустой. value указывается в теле запроса");
+                    System.out.println("Value is empty. value must be in request's body");
                     exchange.sendResponseHeaders(400, 0);
                     return;
                 }
                 data.put(key, value);
-                System.out.println("Значение для ключа " + key + " успешно обновлено!");
+                System.out.println("the value for the key has been successfully updated: " + key);
                 exchange.sendResponseHeaders(200, 0);
             } else {
-                System.out.println("/save ждёт POST-запрос, а получил: " + exchange.getRequestMethod());
+                System.out.println("/save request must be POST, but " + exchange.getRequestMethod());
                 exchange.sendResponseHeaders(405, 0);
             }
-        } finally {
-            exchange.close();
         }
     }
 
     private void register(HttpExchange exchange) throws IOException {
-        try {
+        try (exchange) {
             System.out.println("\n/register");
             if ("GET".equals(exchange.getRequestMethod())) {
                 sendText(exchange, apiToken);
             } else {
-                System.out.println("/register ждёт GET-запрос, а получил " + exchange.getRequestMethod());
+                System.out.println("/register request must be GET, but " + exchange.getRequestMethod());
                 exchange.sendResponseHeaders(405, 0);
             }
-        } finally {
-            exchange.close();
         }
     }
 
     public void start() {
-        System.out.println("Запускаем сервер на порту " + PORT);
-        System.out.println("Открой в браузере http://localhost:" + PORT + "/");
+        System.out.println("KVServer has been started on port " + PORT);
+        System.out.println("Open it on http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + apiToken);
         server.start();
     }
 
     public void stop() {
-        System.out.println("Отключаем сервер на порту " + PORT);
+        System.out.println("KVServer has been stopped on port " + PORT);
         server.stop(0);
     }
 
@@ -125,7 +116,9 @@ public class KVServer {
 
     protected boolean isAuthorized(HttpExchange exchange) {
         String rawQuery = exchange.getRequestURI().getRawQuery();
-        return rawQuery != null && (rawQuery.contains("API_TOKEN=" + apiToken) || rawQuery.contains("API_TOKEN=DEBUG"));
+        return rawQuery == null
+                || (!rawQuery.contains("API_TOKEN=" + apiToken)
+                && !rawQuery.contains("API_TOKEN=DEBUG"));
     }
 
     protected String readText(HttpExchange exchange) throws IOException {
@@ -137,9 +130,5 @@ public class KVServer {
         exchange.getResponseHeaders().add("Content-Type", "application/json");
         exchange.sendResponseHeaders(200, resp.length);
         exchange.getResponseBody().write(resp);
-    }
-
-    public String getApiToken() {
-        return apiToken;
     }
 }

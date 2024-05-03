@@ -140,7 +140,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
     @Test
     public void shouldSaveAndLoadTaskWithStartTimeNull() {
-        Task savedTask = new Task("T", "without start time", Status.NEW, null, 10);
+        Task savedTask = new Task("T", "without start time",
+                Status.NEW, null, 10);
         manager.save(savedTask);
         FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
                 .load(new File("test.csv"));
@@ -152,8 +153,10 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     public void shouldSaveAndLoadSubsWithStartTimeNullAndCorrectCalculateDurationAndTimePointsOfEpic() {
         manager.save(epic);
         manager.save(sub);
-        manager.save(new Sub("sub", "without start time", Status.NEW, null, 10, 1));
-        manager.save(new Task("sub", "without start time", Status.NEW, null, 10));
+        manager.save(new Sub("sub", "without start time",
+                Status.NEW, null, 10, 1));
+        manager.save(new Task("sub", "without start time",
+                Status.NEW, null, 10));
         FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager
                 .load(new File("test.csv"));
         Epic loadedEpic = fileBackedTasksManager.getEpicById(1);

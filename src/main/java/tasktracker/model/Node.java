@@ -1,6 +1,6 @@
 package tasktracker.model;
 
-public class Node <Task> {
+public class Node<Task> {
     private Task data;
     private Node<Task> next;
     private Node<Task> prev;

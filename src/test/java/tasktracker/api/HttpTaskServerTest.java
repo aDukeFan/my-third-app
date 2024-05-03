@@ -1,17 +1,11 @@
 package tasktracker.api;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasktracker.manager.FileBackedTasksManager;
-import tasktracker.model.Epic;
-import tasktracker.model.Status;
-import tasktracker.model.Sub;
-import tasktracker.model.Task;
+import tasktracker.model.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,11 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpTaskServerTest {
 
     private final HttpClient client = HttpClient.newHttpClient();
-    private final Gson gson = new Gson();
+
+    private final Gson gson = new GsonMaker().makeSpesialGson();
     private HttpTaskServer server;
     private FileBackedTasksManager manager;
 
     private static final String LOCAL_HOST_TASKS = "http://localhost:8080/tasks/";
+
 
     @BeforeEach
     public void makeTasks() {

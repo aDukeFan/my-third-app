@@ -4,13 +4,16 @@ import tasktracker.model.Epic;
 import tasktracker.model.Status;
 import tasktracker.model.Sub;
 import tasktracker.model.Task;
+
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
+
     protected final Map<Integer, Task> tasks = new HashMap<>();
+
     protected final Map<Integer, Sub> subs = new HashMap<>();
+
     protected final Map<Integer, Epic> epics = new HashMap<>();
 
     protected final Set<Task> priority = new TreeSet<>(new StartTimeComparator());
@@ -18,7 +21,6 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     protected int nextId = 1;
-
 
     private int generateId() {
         return nextId++;
@@ -109,7 +111,6 @@ public class InMemoryTaskManager implements TaskManager {
             priority.remove(tasks.get(id));
         }
         tasks.clear();
-
     }
 
     @Override
@@ -211,21 +212,30 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             List<Sub> listOfEpicSubs = subs.values()
                     .stream().filter(value -> value.getEpicId() == epic.getId())
-                    .collect(Collectors.toList());
-            epic.setStartTime(listOfEpicSubs.stream()
-                    .map(Task::getStartTime)
-                    .filter(startTime -> Optional.ofNullable(startTime).isPresent())
-                    .min(LocalDateTime::compareTo)
-                    .orElse(null));
-            epic.setEndTime(listOfEpicSubs.stream()
-                    .map(Task::getEndTime)
-                    .filter(epicTime -> Optional.ofNullable(epicTime).isPresent())
-                    .max(LocalDateTime::compareTo)
-                    .orElse(null));
-            epic.setDuration(listOfEpicSubs.stream()
-                    .map(Task::getDuration)
-                    .mapToLong(Long::longValue)
-                    .sum());
+                    .toList();
+            long duration = 0;
+            LocalDateTime startTime = null;
+            LocalDateTime endTime = null;
+            for (Sub sub : listOfEpicSubs) {
+                LocalDateTime subStartTime = sub.getStartTime();
+                LocalDateTime subEndTime = sub.getEndTime();
+                if (startTime == null && subStartTime != null) {
+                    startTime = subStartTime;
+                }
+                if (startTime != null && subStartTime != null && startTime.isAfter(subStartTime)) {
+                    startTime = subStartTime;
+                }
+                if (endTime == null && subEndTime != null)
+                    endTime = subEndTime;
+                if (endTime != null && subEndTime != null && endTime.isBefore(subEndTime)) {
+                    endTime = subEndTime;
+                }
+                duration += sub.getDuration();
+            }
+
+            epic.setStartTime(startTime);
+            epic.setEndTime(endTime);
+            epic.setDuration(duration);
         }
     }
 
@@ -243,19 +253,22 @@ public class InMemoryTaskManager implements TaskManager {
         if (Optional.ofNullable(task.getStartTime()).isPresent() && !priority.isEmpty()) {
             List<Task> listOfTasksAreSetStartTime = priority.stream()
                     .filter(t -> Optional.ofNullable(t.getStartTime()).isPresent())
-                    .collect(Collectors.toList());
+                    .toList();
             if (!listOfTasksAreSetStartTime.isEmpty()) {
                 LocalDateTime expectStart = task.getStartTime();
                 LocalDateTime expectEnd = task.getEndTime();
                 for (Task existTask : listOfTasksAreSetStartTime) {
                     LocalDateTime startOfBusyTime = existTask.getStartTime();
                     LocalDateTime endOfBusyTime = existTask.getEndTime();
-                    boolean isPossibleBefore = expectStart.isBefore(startOfBusyTime) &&
-                            (expectEnd.isBefore(startOfBusyTime) || expectEnd.isEqual(startOfBusyTime));
-                    boolean isPossibleAfter = expectStart.isAfter(endOfBusyTime) || expectStart.isEqual(endOfBusyTime);
+                    boolean isPossibleBefore = expectStart.isBefore(startOfBusyTime)
+                            && (expectEnd.isBefore(startOfBusyTime)
+                            || expectEnd.isEqual(startOfBusyTime));
+                    boolean isPossibleAfter = expectStart.isAfter(endOfBusyTime)
+                            || expectStart.isEqual(endOfBusyTime);
                     if (isPossibleBefore == isPossibleAfter) {
                         System.err.println(
-                                "WARNING! Time is busy: task named \"" + task.getName() + "\" hasn't be saved.");
+                                "WARNING! Time is busy: " +
+                                        "task named \"" + task.getName() + "\" hasn't be saved.");
                         return false;
                     }
                 }

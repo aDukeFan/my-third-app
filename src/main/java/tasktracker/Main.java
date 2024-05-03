@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        // test of the use
         KVServer server = new KVServer();
         server.start();
         HttpTaskManager manager = Managers.getDefault();
 
-        //1. Завел несколько разных задач, эпиков и подзадач.
         Task firstTask = new Task("First Task",
                 "test",
                 Status.NEW,
@@ -41,62 +41,59 @@ public class Main {
                 LocalDateTime.of(2023, 10, 10, 10, 10), 10, 3);
         manager.save(sub);
 
-        //2. Запросил некоторые из них, чтобы заполнилась история просмотра.
         manager.getTaskById(2);
         manager.getSubById(5);
         manager.getEpicById(4);
 
         manager.saveToServer();
 
-        //3. Создал новый HttpTaskManager менеджер методом загрузки с сервера
         HttpTaskManager loadManager = HttpTaskManager.loadFromServer("http://localhost:8078/register");
-        //4. Проверяю, что все задачи, эпики, подзадачи, которые были в старом, есть в новом менеджере:
-        System.out.println("\n--- Задачи созданного менеджера ---");
+
+        System.out.println("\n--- new HttpTaskManager tasks  ---");
         for (Task task : manager.getTasks()) {
             System.out.println(task.getId() + " " + task.getName()
-                    + " начинается в " + task.getStartTime());
+                    + " start in " + task.getStartTime());
         }
-        System.out.println("--- Задачи загруженного менеджера ---");
+        System.out.println("--- loaded HttpTaskManager tasks ---");
         for (Task task : loadManager.getTasks()) {
             System.out.println(task.getId() + " " + task.getName()
-                    + " начинается в " + task.getStartTime());
+                    + " start in " + task.getStartTime());
         }
-        System.out.println("\n--- Эпики созданного менеджера ---");
+        System.out.println("\n--- new HttpTaskManager epics ---");
         for (Epic task : manager.getEpics()) {
             System.out.println(task.getId() + " " + task.getName()
-                    + " начинается в " + task.getStartTime());
+                    + " start in " + task.getStartTime());
         }
-        System.out.println("--- Эпики загруженного менеджера ---");
+        System.out.println("--- loaded HttpTaskManager epics ---");
         for (Epic task : loadManager.getEpics()) {
             System.out.println(task.getId() + " " + task.getName()
-                    + " начинается в " + task.getStartTime());
+                    + " start in " + task.getStartTime());
         }
-        System.out.println("\n--- Подзадачи созданного менеджера ---");
+        System.out.println("\n--- new HttpTaskManager subs ---");
         for (Sub task : manager.getSubs()) {
             System.out.println(task.getId() + " " + task.getName() + " " + task.getEpicId()
-                    + " начинается в " + task.getStartTime());
+                    + " start in " + task.getStartTime());
         }
-        System.out.println("--- Подзадачи загруженного менеджера ---");
+        System.out.println("--- loaded HttpTaskManager subs ---");
         for (Sub task : loadManager.getSubs()) {
             System.out.println(task.getId() + " " + task.getName() + " " + task.getEpicId()
-                    + " начинается в " + task.getStartTime());
+                    + " start in " + task.getStartTime());
         }
 
-        // Проверяю, что история просмотра восстановилась верно:
-        System.out.println("\n--- История созданного менеджера ---");
+        System.out.println("\n--- new HttpTaskManager history ---");
         for (Task task : manager.getHistory()) {
             System.out.println(task.getId() + " " + task.getName());
         }
-        System.out.println("--- История загруженного менеджера ---");
+        System.out.println("--- loaded HttpTaskManager history ---");
         for (Task task : loadManager.getHistory()) {
             System.out.println(task.getId() + " " + task.getName());
         }
-        //Проверяю, что лист задач в порядке приоритета восстановился верно:
-        System.out.println("\n--- Лист задач в порядке приоритета созданного менеджера ---");
+
+        System.out.println("\n--- new HttpTaskManager  priority list ---");
         for (Task task : manager.getPrioritizedTasks()) {
             System.out.println(task.getId() + " " + task.getName());
         }
-        System.out.println("--- Лист задач в порядке приоритета загруженного менеджера ---");
+        System.out.println("--- loaded HttpTaskManager priority list ---");
         for (Task task : loadManager.getPrioritizedTasks()) {
             System.out.println(task.getId() + " " + task.getName());
         }

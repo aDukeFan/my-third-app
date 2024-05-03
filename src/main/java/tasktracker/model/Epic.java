@@ -1,7 +1,6 @@
 package tasktracker.model;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +26,7 @@ public class Epic extends Task {
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
+
     public void setDuration(long duration) {
         this.duration = duration;
     }

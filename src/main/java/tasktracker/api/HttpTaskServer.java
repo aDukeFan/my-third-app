@@ -2,7 +2,8 @@ package tasktracker.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.sun.net.httpserver.*;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import tasktracker.ManagerSaveException;
 import tasktracker.manager.FileBackedTasksManager;
 import tasktracker.manager.Managers;
@@ -16,8 +17,9 @@ import java.net.InetSocketAddress;
 import java.util.regex.Pattern;
 
 public class HttpTaskServer {
+
     private static final int PORT = 8080;
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonMaker().makeSpesialGson();
 
     private final HttpServer server;
 
@@ -33,17 +35,17 @@ public class HttpTaskServer {
     }
 
     public void start() {
-        System.out.println("HTTP-сервер запущен на " + PORT + " порту.");
+        System.out.println("HTTP-server has been started on port " + PORT);
         server.start();
     }
 
     public void stop() {
         server.stop(0);
-        System.out.println("HTTP-сервер остановлен на " + PORT + " порту.");
+        System.out.println("HTTP-server has been stopped on port " + PORT);
     }
 
     private void handle(HttpExchange exchange) {
-        try {
+        try (exchange) {
             String requestMethod = exchange.getRequestMethod();
             switch (requestMethod) {
                 case "GET":
@@ -61,8 +63,6 @@ public class HttpTaskServer {
             }
         } catch (Exception exception) {
             throw new ManagerSaveException("WASTED...");
-        } finally {
-            exchange.close();
         }
     }
 
@@ -200,7 +200,7 @@ public class HttpTaskServer {
                 String jsonTask = new String(exchange.getRequestBody().readAllBytes());
                 try {
                     gson.fromJson(jsonTask, Task.class);
-                } catch (JsonSyntaxException e) {
+                } catch (JsonSyntaxException exception) {
                     writeResponse(exchange, "Invalid json format", 400);
                 }
                 Task taskFromGson = gson.fromJson(jsonTask, Task.class);
@@ -223,7 +223,7 @@ public class HttpTaskServer {
                 String jsonSub = new String(exchange.getRequestBody().readAllBytes());
                 try {
                     gson.fromJson(jsonSub, Sub.class);
-                } catch (JsonSyntaxException e) {
+                } catch (JsonSyntaxException exception) {
                     writeResponse(exchange, "Invalid json format", 400);
                 }
                 Sub subFromGson = gson.fromJson(jsonSub, Sub.class);

@@ -1,7 +1,5 @@
 package tasktracker.manager;
 
-import java.io.File;
-
 public class Managers {
 
     private Managers() {
